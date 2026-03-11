@@ -11,7 +11,7 @@ class ProductFactory extends Factory
 {
     public function definition(): array
     {
-        $categories = ['beauty', 'electronics', 'fashion'];
+        $categories = ['mannequins', 'hangers'];
         $brands = ['Essence', 'Glamour Beauty', 'Velvet Touch', 'Acme', 'Umbrella'];
         $availability = ['In Stock', 'Out of Stock', 'Preorder'];
 
@@ -20,18 +20,15 @@ class ProductFactory extends Factory
 
         // Assign valid images based on category
         $categoryImages = [
-            'beauty' => [
-                'https://images.pexels.com/photos/beauty-products-1.jpg',
-                'https://images.pexels.com/photos/beautiful-cosmetics-on-shelf.jpg',
-                'https://images.unsplash.com/photo-1514996937319-344454492b37?fit=crop&w=800&q=80',
+            'mannequins' => [
+                'https://images.unsplash.com/photo-1770529933763-2d8b94fe6ba9?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MzV8fG1hbm5lcXVpbnN8ZW58MHx8MHx8fDA%3D',
+                'https://images.unsplash.com/photo-1729941346784-1710d3e75ac2?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fG1hbm5lcXVpbnN8ZW58MHx8MHx8fDA%3D',
+                'https://plus.unsplash.com/premium_photo-1677838847808-686ac388d5f6?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bWFubmVxdWluc3xlbnwwfHwwfHx8MA%3D%3D',
             ],
-            'electronics' => [
-                'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?fit=crop&w=800&q=80',
-                'https://unsplash.com/photos/gadgets-01.jpg',
-            ],
-            'fashion' => [
-                'https://images.unsplash.com/photo-1521334884684-d80222895322?fit=crop&w=800&q=80',
-                'https://images.pexels.com/photos/fashion-trend-2.jpg',
+            'hangers' => [
+                'https://plus.unsplash.com/premium_photo-1672883552008-e40d0a48fcbd?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aGFuZ2Vyc3xlbnwwfHwwfHx8MA%3D%3D',
+                'https://images.unsplash.com/photo-1519220279207-fddf068f2141?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8aGFuZ2Vyc3xlbnwwfHwwfHx8MA%3D%3D',
+                'https://images.unsplash.com/photo-1584467331486-29e6c30262c3?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8aGFuZ2Vyc3xlbnwwfHwwfHx8MA%3D%3D',
             ],
         ];
 

@@ -18,7 +18,7 @@ class UserController extends Controller
     }
 
     /**
-     * PUT /products/{product}/images
+     * PUT /users/{user}/images
      * Upload Images
      */
     public function uploadImages(Request $request, User $user)
