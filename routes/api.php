@@ -11,6 +11,12 @@ Route::get('/test', function () {
     ]);
 });
 
+Route::get('/routes-check', function () {
+    return collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
+        return $route->uri();
+    });
+});
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
