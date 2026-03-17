@@ -28,6 +28,10 @@ Route::get('/test', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Public guest products
+Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
+
 // Route::prefix('/admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
@@ -40,8 +44,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     });
 
     Route::controller(ProductController::class)->group(function () {
-        Route::get('/products', 'index');
-        Route::get('/products/{id}', 'show');
+        // Route::get('/products', 'index');
+        // Route::get('/products/{id}', 'show');
         Route::post('/products/{product}/images', 'uploadImages');
         Route::post('/products', 'store');
         Route::put('/products/{id}', 'update');
