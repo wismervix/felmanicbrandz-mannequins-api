@@ -6,9 +6,28 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Products", description: "Product management endpoints")]
 class ProductController extends Controller
 {
+    #[OA\Get(
+        path: "/api/products",
+        summary: "List all products",
+        description: "Get a list of all products",
+        tags: ["Products"],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: "Successful operation",
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: "products", type: "array", items: new OA\Items(type: "object"))
+                    ]
+                )
+            )
+        ]
+    )]
     public function index()
     {
         return response()->json([
@@ -16,10 +35,19 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * GET /api/products/{id}
-     * Show single product
-     */
+    #[OA\Get(
+        path: "/api/products/{id}",
+        summary: "Get product by ID",
+        description: "Retrieve a single product by its ID",
+        tags: ["Products"],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Product found"),
+            new OA\Response(response: 404, description: "Product not found")
+        ]
+    )]
     public function show($id)
     {
         $product = Product::findOrFail($id);
@@ -29,10 +57,46 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * POST /api/products
-     * Create product
-     */
+    #[OA\Post(
+        path: "/api/products",
+        summary: "Create product",
+        description: "Create a new product",
+        tags: ["Products"],
+        security: [["bearerAuth" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["title", "price"],
+                properties: [
+                    new OA\Property(property: "title", type: "string", example: "Mannequin Stand"),
+                    new OA\Property(property: "description", type: "string", nullable: true),
+                    new OA\Property(property: "category", type: "string", nullable: true),
+                    new OA\Property(property: "price", type: "number", format: "float", example: 99.99),
+                    new OA\Property(property: "discount_percentage", type: "number", nullable: true),
+                    new OA\Property(property: "rating", type: "number", nullable: true),
+                    new OA\Property(property: "stock", type: "integer", nullable: true),
+                    new OA\Property(property: "brand", type: "string", nullable: true),
+                    new OA\Property(property: "sku", type: "string", nullable: true),
+                    new OA\Property(property: "weight", type: "integer", nullable: true),
+                    new OA\Property(property: "warranty_information", type: "string", nullable: true),
+                    new OA\Property(property: "shipping_information", type: "string", nullable: true),
+                    new OA\Property(property: "availability_status", type: "string", nullable: true),
+                    new OA\Property(property: "return_policy", type: "string", nullable: true),
+                    new OA\Property(property: "minimum_order_quantity", type: "integer", nullable: true),
+                    new OA\Property(property: "tags", type: "array", items: new OA\Items(type: "string"), nullable: true),
+                    new OA\Property(property: "images", type: "array", items: new OA\Items(type: "string"), nullable: true),
+                    new OA\Property(property: "dimensions", type: "object", nullable: true),
+                    new OA\Property(property: "reviews", type: "array", items: new OA\Items(type: "object"), nullable: true),
+                    new OA\Property(property: "meta", type: "object", nullable: true),
+                    new OA\Property(property: "thumbnail", type: "string", nullable: true)
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: "Product created"),
+            new OA\Response(response: 422, description: "Validation error")
+        ]
+    )]
     public function store(Request $request)
     {
         $validated = $this->validateProduct($request);
@@ -45,19 +109,36 @@ class ProductController extends Controller
         ], 201);
     }
 
-    /**
-     * PUT /products/{product}/images
-     * Upload Images
-     */
+    #[OA\Post(
+        path: "/api/products/{product}/images",
+        summary: "Upload product images",
+        description: "Upload or update images for a product",
+        tags: ["Products"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(name: "product", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    properties: [
+                        new OA\Property(property: "thumbnail", type: "string", format: "binary"),
+                        new OA\Property(property: "images[]", type: "array", items: new OA\Items(type: "string", format: "binary")),
+                        new OA\Property(property: "removedImages", type: "array", items: new OA\Items(type: "string"))
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Images synced")
+        ]
+    )]
     public function uploadImages(Request $request, Product $product)
     {
         $images = $product->images ?? [];
 
-        /*
-    | DELETE REMOVED IMAGES
-    */
         if ($request->has('removedImages')) {
-
             foreach ($request->removedImages as $removed) {
                 Storage::disk('public')->delete($removed);
             }
@@ -68,31 +149,19 @@ class ProductController extends Controller
             ));
         }
 
-        /*
-    | UPDATE THUMBNAIL
-    */
         if ($request->hasFile('thumbnail')) {
-
             if ($product->thumbnail) {
                 $old = str_replace('/storage/', '', $product->thumbnail);
                 Storage::disk('public')->delete($old);
             }
 
-            $path = $request->file('thumbnail')
-                ->store('', 'public');
-
+            $path = $request->file('thumbnail')->store('', 'public');
             $product->thumbnail = $path;
         }
 
-        /*
-    | ADD NEW IMAGES
-    */
         if ($request->hasFile('images')) {
-
             foreach ($request->file('images') as $file) {
-
                 $path = $file->store('', 'public');
-
                 $images[] = $path;
             }
         }
@@ -106,10 +175,29 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * PUT /api/products/{id}
-     * Update product
-     */
+    #[OA\Put(
+        path: "/api/products/{id}",
+        summary: "Update product",
+        description: "Update an existing product",
+        tags: ["Products"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "title", type: "string"),
+                    new OA\Property(property: "description", type: "string", nullable: true),
+                    new OA\Property(property: "price", type: "number", format: "float"),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Product updated"),
+            new OA\Response(response: 404, description: "Product not found")
+        ]
+    )]
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -124,7 +212,20 @@ class ProductController extends Controller
         ]);
     }
 
-    // Delete a product
+    #[OA\Delete(
+        path: "/api/products/{id}",
+        summary: "Delete product",
+        description: "Delete a product by ID",
+        tags: ["Products"],
+        security: [["bearerAuth" => []]],
+        parameters: [
+            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Product deleted"),
+            new OA\Response(response: 404, description: "Product not found")
+        ]
+    )]
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
@@ -136,9 +237,6 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Shared validation logic
-     */
     private function validateProduct(Request $request, $isUpdate = false)
     {
         $rules = [

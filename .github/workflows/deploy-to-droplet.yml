@@ -54,6 +54,17 @@ jobs:
             docker-compose exec -T app php artisan view:cache || true
             docker-compose exec -T app chown -R www-data:www-data storage bootstrap/cache || true
 
+            echo "=== Health Check ==="
+            sleep 5
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/up || echo "000")
+            if [ "$HTTP_STATUS" = "200" ]; then
+              echo "✓ App is healthy (HTTP 200)"
+            else
+              echo "✗ App health check failed (HTTP $HTTP_STATUS)"
+              docker-compose logs --tail=50 app
+              exit 1
+            fi
+
             echo "=== Cleanup ==="
             docker system prune -f
 
