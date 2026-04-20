@@ -56,7 +56,7 @@ jobs:
 
             echo "=== Health Check ==="
             sleep 5
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/up || echo "000")
+            HTTP_STATUS=$(curl -sL -o /dev/null -w "%{http_code}" http://localhost/up || echo "000")
             if [ "$HTTP_STATUS" = "200" ]; then
               echo "✓ App is healthy (HTTP 200)"
             else
