@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+
     steps:
       # ----------------------------------------
       # 1. Deploy via SSH
@@ -23,17 +27,17 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_SSH_KEY }}
           port: 22
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_REPO
           script: |
             set -e
             APP_DIR="/var/www/felmanicbrandz-mannequins-api"
-            IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest"
+            IMAGE="${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:latest"
 
-            echo "=== Pulling latest image ==="
+            echo "=== Pulling image: $IMAGE ==="
             docker pull $IMAGE
 
-            echo "=== Updating docker-compose.yml to use pulled image ==="
+            echo "=== Updating docker-compose.yml ==="
             cd $APP_DIR
-            # Replace build context with pulled image
             sed -i 's|build:.*|image: '"$IMAGE"'|' docker-compose.yml
             sed -i '/dockerfile: Dockerfile/d' docker-compose.yml
             sed -i '/context: ./d' docker-compose.yml
