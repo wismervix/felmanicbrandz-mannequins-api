@@ -19,11 +19,11 @@ Route::get('/test', function () {
 //     return 'Admin password reset!';
 // });
 
-// Route::get('/routes-check', function () {
-//     return collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
-//         return $route->uri();
-//     });
-// });
+Route::get('/routes-check', function () {
+    return collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
+        return $route->uri();
+    });
+});
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
