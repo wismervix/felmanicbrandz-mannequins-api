@@ -1,0 +1,55 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  workflow_run:
+    workflows: ["Build & Push Docker Image"]
+    types:
+      - completed
+    branches: [main, master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      # ----------------------------------------
+      # 1. Deploy via SSH
+      # ----------------------------------------
+      - name: Deploy to DigitalOcean Droplet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            APP_DIR="/var/www/felmanicbrandz-mannequins-api"
+            IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPO }}:latest"
+
+            echo "=== Pulling latest image ==="
+            docker pull $IMAGE
+
+            echo "=== Updating docker-compose.yml to use pulled image ==="
+            cd $APP_DIR
+            # Replace build context with pulled image
+            sed -i 's|build:.*|image: '"$IMAGE"'|' docker-compose.yml
+            sed -i '/dockerfile: Dockerfile/d' docker-compose.yml
+            sed -i '/context: ./d' docker-compose.yml
+
+            echo "=== Restarting containers ==="
+            docker-compose down
+            docker-compose up -d
+
+            echo "=== Running Laravel optimizations ==="
+            docker-compose exec -T app php artisan migrate --force || true
+            docker-compose exec -T app php artisan config:cache || true
+            docker-compose exec -T app php artisan route:cache || true
+            docker-compose exec -T app php artisan view:cache || true
+            docker-compose exec -T app chown -R www-data:www-data storage bootstrap/cache || true
+
+            echo "=== Cleanup ==="
+            docker system prune -f
+
+            echo "=== Deployment complete ==="
