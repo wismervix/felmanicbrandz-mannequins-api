@@ -46,7 +46,8 @@ jobs:
             docker-compose down
             docker-compose up -d
 
-            echo "=== Running Laravel optimizations ==="
+            echo "=== Waiting for MySQL to be ready ==="
+            sleep 10
             docker-compose exec -T app php artisan migrate --force || true
             docker-compose exec -T app php artisan config:cache || true
             docker-compose exec -T app php artisan route:cache || true
