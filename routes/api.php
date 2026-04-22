@@ -57,7 +57,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 // Public guest users
-Route::get('/users', [UserController::class, 'index']);
+// Route::get('/users', [UserController::class, 'index']);
+Route::get('/users', function () {
+    return 'HELLO USERS';
+});
 // Public guest products
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
