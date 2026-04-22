@@ -11,13 +11,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Users", description: "User management endpoints")]
 class UserController extends Controller
+// security: [["bearerAuth" => []]],
 {
     #[OA\Get(
         path: "/api/users",
         summary: "List all users",
         description: "Get a list of all registered users",
         tags: ["Users"],
-        // security: [["bearerAuth" => []]],
         responses: [
             new OA\Response(
                 response: 200,
