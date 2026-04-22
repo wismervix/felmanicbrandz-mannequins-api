@@ -30,22 +30,22 @@ class UserController extends Controller
             )
         ]
     )]
-    public function index()
-    {
-        return response()->json([
-            'test' => 'users route working'
-        ]);
-        // try {
-        //     return User::all();
-        // } catch (\Exception $e) {
-        //     return response()->json([
-        //         'error' => $e->getMessage()
-        //     ], 500);
-        // }
-        // return response()->json([
-        //     'users' => User::all(),
-        // ]);
-    }
+    // public function index()
+    // {
+    //     return response()->json([
+    //         'test' => 'users route working'
+    //     ]);
+    //     // try {
+    //     //     return User::all();
+    //     // } catch (\Exception $e) {
+    //     //     return response()->json([
+    //     //         'error' => $e->getMessage()
+    //     //     ], 500);
+    //     // }
+    //     // return response()->json([
+    //     //     'users' => User::all(),
+    //     // ]);
+    // }
 
     #[OA\Post(
         path: "/api/users/{user}/images",
