@@ -1,8 +1,19 @@
-use Illuminate\Auth\AuthenticationException;
+<?php
 
-protected function unauthenticated($request, AuthenticationException $exception)
+namespace App\Exceptions;
+
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
+use Throwable;
+
+class Handler extends ExceptionHandler
 {
-return response()->json([
-'message' => 'Unauthenticated'
-], 401);
+    // other methods...
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return response()->json([
+            'message' => 'Unauthenticated'
+        ], 401);
+    }
 }
