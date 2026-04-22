@@ -1,12 +1,23 @@
-'paths' => ['api/*'],
+<?php
 
-'allowed_methods' => ['*'],
+return [
 
-'allowed_origins' => [
-'https://felmanicbrandz.com',
-'https://www.felmanicbrandz.com'
-],
+    'paths' => ['api/*'],
 
-'allowed_headers' => ['*'],
+    'allowed_methods' => ['*'],
 
-'supports_credentials' => true,
+    'allowed_origins' => [
+        'https://felmanicbrandz.com',
+        'https://www.felmanicbrandz.com'
+    ],
+
+    'allowed_headers' => ['*'],
+
+    'exposed_headers' => [],
+
+    'max_age' => 0,
+
+
+    'supports_credentials' => true,
+
+];
