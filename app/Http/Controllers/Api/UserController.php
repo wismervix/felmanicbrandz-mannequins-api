@@ -32,9 +32,16 @@ class UserController extends Controller
     )]
     public function index()
     {
-        return response()->json([
-            'users' => User::all(),
-        ]);
+        try {
+            return User::all();
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+        // return response()->json([
+        //     'users' => User::all(),
+        // ]);
     }
 
     #[OA\Post(
