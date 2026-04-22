@@ -46,6 +46,9 @@ COPY . .
 # Install PHP dependencies (no dev for production)
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
+# Clear any locally-generated bootstrap cache that may reference dev-only packages
+RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
