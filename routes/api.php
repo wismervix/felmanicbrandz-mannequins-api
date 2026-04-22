@@ -53,27 +53,27 @@ Route::get('/routes-check', function () {
     });
 });
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/login', [AuthController::class, 'login'])->name('admin.login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout')->middleware('auth:sanctum');
 
 // Public guest products
-Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products', [ProductController::class, 'index'])->name('admin.products');
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('admin.products.show');
 
 // Protected admin routes
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/users', [UserController::class, 'index']);
 
     Route::controller(UserController::class)->group(function () {
-        Route::put('/users/{id}', 'update');
-        Route::delete('/users/{id}', 'destroy');
-        Route::post('/users/{user}/images', 'uploadImages');
+        Route::get('/users', 'index')->name('admin.users');
+        Route::put('/users/{id}', 'update')->name('admin.users.update');
+        Route::delete('/users/{id}', 'destroy')->name('admin.users.delete');
+        Route::post('/users/{user}/images', 'uploadImages')->name('admin.users.image-uploads');
     });
 
     Route::controller(ProductController::class)->group(function () {
-        Route::post('/products/{product}/images', 'uploadImages');
-        Route::post('/products', 'store');
-        Route::put('/products/{id}', 'update');
-        Route::delete('/products/{id}', 'destroy');
+        Route::post('/products/{product}/images', 'uploadImages')->name('admin.products.image-uploads');
+        Route::post('/products', 'store')->name('admin.products.store');
+        Route::put('/products/{id}', 'update')->name('admin.products.update');
+        Route::delete('/products/{id}', 'destroy')->name('admin.products.delete');
     });
 });
