@@ -17,7 +17,7 @@ class UserController extends Controller
         summary: "List all users",
         description: "Get a list of all registered users",
         tags: ["Users"],
-        security: [["bearerAuth" => []]],
+        // security: [["bearerAuth" => []]],
         responses: [
             new OA\Response(
                 response: 200,
