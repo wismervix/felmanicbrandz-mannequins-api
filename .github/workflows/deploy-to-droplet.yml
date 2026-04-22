@@ -42,6 +42,9 @@ jobs:
             sed -i '/dockerfile: Dockerfile/d' docker-compose.yml
             sed -i '/context: ./d' docker-compose.yml
 
+            echo "=== Clearing stale bootstrap cache ==="
+            rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+
             echo "=== Restarting containers ==="
             docker-compose down
             docker-compose up -d
