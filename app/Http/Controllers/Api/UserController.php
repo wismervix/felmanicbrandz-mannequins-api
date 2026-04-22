@@ -11,13 +11,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Users", description: "User management endpoints")]
 class UserController extends Controller
+// security: [["bearerAuth" => []]],
 {
     #[OA\Get(
         path: "/api/users",
         summary: "List all users",
         description: "Get a list of all registered users",
         tags: ["Users"],
-        security: [["bearerAuth" => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -30,12 +30,22 @@ class UserController extends Controller
             )
         ]
     )]
-    public function index()
-    {
-        return response()->json([
-            'users' => User::all(),
-        ]);
-    }
+    // public function index()
+    // {
+    //     return response()->json([
+    //         'test' => 'users route working'
+    //     ]);
+    //     // try {
+    //     //     return User::all();
+    //     // } catch (\Exception $e) {
+    //     //     return response()->json([
+    //     //         'error' => $e->getMessage()
+    //     //     ], 500);
+    //     // }
+    //     // return response()->json([
+    //     //     'users' => User::all(),
+    //     // ]);
+    // }
 
     #[OA\Post(
         path: "/api/users/{user}/images",
