@@ -3,8 +3,9 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 Route::get('/test', function () {
     return response()->json([
@@ -13,14 +14,26 @@ Route::get('/test', function () {
 });
 
 Route::get('/reset-admin-password', function () {
-    $user = \App\Models\User::where('email', 'isaacosrael011@gmail.com')->first();
+    $user = User::where('email', 'isaacosrael011@gmail.com')->first();
+
+    if (!$user) {
+        $user = User::create([
+            'name' => 'Admin',
+            'email' => 'isaacosrael011@gmail.com',
+            'password' => Hash::make('12345678'),
+        ]);
+
+        return 'Admin user created!';
+    }
+
     $user->password = Hash::make('12345678');
     $user->save();
+
     return 'Admin password reset!';
 });
 
 Route::get('/routes-check', function () {
-    return collect(\Illuminate\Support\Facades\Route::getRoutes())->map(function ($route) {
+    return collect(Route::getRoutes())->map(function ($route) {
         return $route->uri();
     });
 });
