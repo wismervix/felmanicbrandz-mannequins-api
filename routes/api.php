@@ -14,22 +14,37 @@ Route::get('/test', function () {
 });
 
 Route::get('/reset-admin-password', function () {
-    $user = User::where('email', 'isaacosrael011@gmail.com')->first();
+    try {
+        $user = User::where('email', 'isaacosrael011@gmail.com')->first();
 
-    if (!$user) {
-        $user = User::create([
-            'name' => 'Admin',
-            'email' => 'isaacosrael011@gmail.com',
-            'password' => Hash::make('12345678'),
-        ]);
+        if (!$user) {
+            $user = User::create([
+                'first_name' => 'Admin',
+                'last_name'  => 'User',
+                'age'        => 30,
+                'gender'     => 'male',
+                'email'      => 'isaacosrael011@gmail.com',
+                'username'   => 'admin',
+                'password'   => Hash::make('12345678'),
+                'birthDate'  => '1995-01-01',
+                'image'      => 'default.png',
+                'role'       => 'admin',
+                'address'    => 'N/A',
+                'city'       => 'N/A',
+                'state'      => 'N/A',
+                'country'    => 'N/A',
+            ]);
 
-        return 'Admin user created!';
+            return 'Admin user created!';
+        }
+
+        $user->password = Hash::make('12345678');
+        $user->save();
+
+        return 'Admin password reset!';
+    } catch (\Exception $e) {
+        return $e->getMessage(); // 👈 this exposes the real error
     }
-
-    $user->password = Hash::make('12345678');
-    $user->save();
-
-    return 'Admin password reset!';
 });
 
 Route::get('/routes-check', function () {
