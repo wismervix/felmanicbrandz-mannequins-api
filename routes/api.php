@@ -58,6 +58,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 // Public guest users
 // Route::get('/users', [UserController::class, 'index']);
+Route::get('/all-users', function () {
+    return 'HELLO USERS';
+});
 Route::get('/users', function () {
     return 'HELLO USERS';
 });
