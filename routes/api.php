@@ -56,6 +56,8 @@ Route::get('/routes-check', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Public guest users
+Route::get('/users', [UserController::class, 'index']);
 // Public guest products
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
@@ -65,7 +67,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
 
     Route::controller(UserController::class)->group(function () {
-        Route::get('/users', 'index');
+        // Route::get('/users', 'index');
         Route::put('/users/{id}', 'update');
         Route::delete('/users/{id}', 'destroy');
         Route::post('/users/{user}/images', 'uploadImages');
