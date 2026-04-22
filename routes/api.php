@@ -56,44 +56,24 @@ Route::get('/routes-check', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// Public guest users
-// Route::get('/users', [UserController::class, 'index']);
-Route::get('/all-users', function () {
-    return 'HELLO USERS';
-});
-Route::get('/users', function () {
-    return 'HELLO USERS';
-});
 // Public guest products
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 
-// Route::prefix('/admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+// Protected admin routes
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-
+    Route::get('/users', [UserController::class, 'index']);
 
     Route::controller(UserController::class)->group(function () {
-        // Route::get('/users', 'index');
         Route::put('/users/{id}', 'update');
         Route::delete('/users/{id}', 'destroy');
         Route::post('/users/{user}/images', 'uploadImages');
     });
 
     Route::controller(ProductController::class)->group(function () {
-        // Route::get('/products', 'index');
-        // Route::get('/products/{id}', 'show');
         Route::post('/products/{product}/images', 'uploadImages');
         Route::post('/products', 'store');
         Route::put('/products/{id}', 'update');
         Route::delete('/products/{id}', 'destroy');
     });
 });
-
-// Route::middleware('auth')->group(function () {
-
-//     Route::get('/admin/products', function () {
-//         return 'Admin only';
-//     });
-// });
-
-// Route::get('/admin', [AuthController::class, 'login']);
