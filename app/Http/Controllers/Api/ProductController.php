@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use OpenApi\Attributes as OA;
@@ -134,14 +135,14 @@ class ProductController extends Controller
             new OA\Response(response: 200, description: "Images synced")
         ]
     )]
-    public function uploadImages(Request $request, Product $product)
+    public function uploadImages(Request $request, Product $product, CloudinaryService $cloudinary)
     {
         $images = $product->images ?? [];
 
         if ($request->has('removedImages')) {
-            foreach ($request->removedImages as $removed) {
-                Storage::disk('public')->delete($removed);
-            }
+            // foreach ($request->removedImages as $removed) {
+            //     Storage::disk('public')->delete($removed);
+            // }
 
             $images = array_values(array_filter(
                 $images,
@@ -150,19 +151,29 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('thumbnail')) {
-            if ($product->thumbnail) {
-                $old = str_replace('/storage/', '', $product->thumbnail);
-                Storage::disk('public')->delete($old);
-            }
 
-            $path = $request->file('thumbnail')->store('', 'public');
-            $product->thumbnail = $path;
+            $uploaded = $cloudinary->upload($request->file('thumbnail'), 'products/thumbnails');
+
+            $product->thumbnail = $uploaded['secure_url'];
+
+            // if ($product->thumbnail) {
+            //     $old = str_replace('/storage/', '', $product->thumbnail);
+            //     Storage::disk('public')->delete($old);
+            // }
+
+            // $path = $request->file('thumbnail')->store('', 'public');
+            // $product->thumbnail = $path;
         }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                $path = $file->store('', 'public');
-                $images[] = $path;
+
+                $uploaded = $cloudinary->upload($file, 'products');
+
+                $images[] = $uploaded['secure_url'];
+
+                // $path = $file->store('', 'public');
+                // $images[] = $path;
             }
         }
 

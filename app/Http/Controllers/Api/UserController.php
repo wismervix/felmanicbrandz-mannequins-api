@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
@@ -60,16 +61,24 @@ class UserController extends Controller
             new OA\Response(response: 200, description: "Image synced")
         ]
     )]
-    public function uploadImages(Request $request, User $user)
+    public function uploadImages(Request $request, User $user, CloudinaryService $cloudinary)
     {
         if ($request->hasFile('image')) {
-            if ($user->image) {
-                $old = str_replace('/storage/', '', $user->image);
-                Storage::disk('public')->delete($old);
-            }
 
-            $path = $request->file('image')->store('', 'public');
-            $user->image = $path;
+
+            // Upload to Cloudinary
+            $uploaded = $cloudinary->upload($request->file('image'), 'users');
+
+            // Save ONLY the URL
+            $user->image = $uploaded['secure_url'];
+
+            // if ($user->image) {
+            //     $old = str_replace('/storage/', '', $user->image);
+            //     Storage::disk('public')->delete($old);
+            // }
+
+            // $path = $request->file('image')->store('', 'public');
+            // $user->image = $path;
         }
 
         $user->save();
