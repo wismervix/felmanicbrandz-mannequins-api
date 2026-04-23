@@ -146,7 +146,7 @@ class ProductController extends Controller
 
             $images = array_values(array_filter(
                 $images,
-                fn($img) => !in_array($img, $request->removedImages)
+                fn($img) => !in_array($img['url'], $request->removedImages)
             ));
         }
 
@@ -154,15 +154,11 @@ class ProductController extends Controller
 
             $uploaded = $cloudinary->upload($request->file('thumbnail'), 'products/thumbnails');
 
-            $product->thumbnail = $uploaded['secure_url'];
+            $product->thumbnail = [
+                'url' => $uploaded['secure_url'],
+                'public_id' => $uploaded['public_id'],
+            ];
 
-            // if ($product->thumbnail) {
-            //     $old = str_replace('/storage/', '', $product->thumbnail);
-            //     Storage::disk('public')->delete($old);
-            // }
-
-            // $path = $request->file('thumbnail')->store('', 'public');
-            // $product->thumbnail = $path;
         }
 
         if ($request->hasFile('images')) {
@@ -170,10 +166,11 @@ class ProductController extends Controller
 
                 $uploaded = $cloudinary->upload($file, 'products');
 
-                $images[] = $uploaded['secure_url'];
+                $images[] = [
+                    'url' => $uploaded['secure_url'],
+                    'public_id' => $uploaded['public_id'],
+                ];
 
-                // $path = $file->store('', 'public');
-                // $images[] = $path;
             }
         }
 

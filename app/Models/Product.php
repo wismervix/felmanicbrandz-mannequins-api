@@ -38,6 +38,7 @@ class Product extends Model
     protected $casts = [
         'tags' => 'array',
         'images' => 'array',
+        'thumbnail' => 'array',
         'dimensions' => 'array',
         'reviews' => 'array',
         'meta' => 'array',
