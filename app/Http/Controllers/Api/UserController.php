@@ -73,7 +73,7 @@ class UserController extends Controller
 
                 $uploaded = $cloudinary->upload($request->file('image'), 'users');
 
-                Log::info('Cloudinary response', $uploaded);
+                Log::info('Cloudinary response', ['data' => $uploaded]);
 
                 $user->image = $uploaded['secure_url'];
             }
