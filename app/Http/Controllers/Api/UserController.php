@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use OpenApi\Attributes as OA;
@@ -63,30 +64,60 @@ class UserController extends Controller
     )]
     public function uploadImages(Request $request, User $user, CloudinaryService $cloudinary)
     {
-        if ($request->hasFile('image')) {
+        try {
+            if ($request->hasFile('image')) {
 
+                Log::info('File received', [
+                    'name' => $request->file('image')->getClientOriginalName()
+                ]);
 
-            // Upload to Cloudinary
-            $uploaded = $cloudinary->upload($request->file('image'), 'users');
+                $uploaded = $cloudinary->upload($request->file('image'), 'users');
 
-            // Save ONLY the URL
-            $user->image = $uploaded['secure_url'];
+                Log::info('Cloudinary response', $uploaded);
 
-            // if ($user->image) {
-            //     $old = str_replace('/storage/', '', $user->image);
-            //     Storage::disk('public')->delete($old);
-            // }
+                $user->image = $uploaded['secure_url'];
+            }
 
-            // $path = $request->file('image')->store('', 'public');
-            // $user->image = $path;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Images synced',
+                'user' => $user->fresh()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Upload failed', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
 
-        $user->save();
+        // if ($request->hasFile('image')) {
 
-        return response()->json([
-            'message' => 'Images synced',
-            'user' => $user->fresh()
-        ]);
+
+        //     // Upload to Cloudinary
+        //     $uploaded = $cloudinary->upload($request->file('image'), 'users');
+
+        //     // Save ONLY the URL
+        //     $user->image = $uploaded['secure_url'];
+
+        //     // if ($user->image) {
+        //     //     $old = str_replace('/storage/', '', $user->image);
+        //     //     Storage::disk('public')->delete($old);
+        //     // }
+
+        //     // $path = $request->file('image')->store('', 'public');
+        //     // $user->image = $path;
+        // }
+
+        // $user->save();
+
+        // return response()->json([
+        //     'message' => 'Images synced',
+        //     'user' => $user->fresh()
+        // ]);
     }
 
     #[OA\Put(
