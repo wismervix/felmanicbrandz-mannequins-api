@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use OpenApi\Attributes as OA;
+use App\Http\Controllers\Controller;
+use App\Services\ImageManagerService;
 
 #[OA\Tag(name: "Products", description: "Product management endpoints")]
 class ProductController extends Controller
@@ -135,51 +134,25 @@ class ProductController extends Controller
             new OA\Response(response: 200, description: "Images synced")
         ]
     )]
-    public function uploadImages(Request $request, Product $product, CloudinaryService $cloudinary)
+    public function uploadImages(Request $request, Product $product, ImageManagerService $imageManager)
     {
-        $images = $product->images ?? [];
+        $request->validate([
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
+            'removedImages' => 'nullable|array',
+            'removedImages.*' => 'string'
+        ]);
 
-        if ($request->has('removedImages')) {
-            // foreach ($request->removedImages as $removed) {
-            //     Storage::disk('public')->delete($removed);
-            // }
+        $result = $imageManager->updateProductImages($product, $request);
 
-            $images = array_values(array_filter(
-                $images,
-                fn($img) => !in_array($img['url'], $request->removedImages)
-            ));
+        if (!$result['success']) {
+            return response()->json(['error' => $result['error']], 500);
         }
-
-        if ($request->hasFile('thumbnail')) {
-
-            $uploaded = $cloudinary->upload($request->file('thumbnail'), 'products/thumbnails');
-
-            $product->thumbnail = [
-                'url' => $uploaded['secure_url'],
-                'public_id' => $uploaded['public_id'],
-            ];
-
-        }
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $file) {
-
-                $uploaded = $cloudinary->upload($file, 'products');
-
-                $images[] = [
-                    'url' => $uploaded['secure_url'],
-                    'public_id' => $uploaded['public_id'],
-                ];
-
-            }
-        }
-
-        $product->images = array_values($images);
-        $product->save();
 
         return response()->json([
             'message' => 'Images synced',
-            'product' => $product->fresh()
+            'product' => $result['product']
         ]);
     }
 

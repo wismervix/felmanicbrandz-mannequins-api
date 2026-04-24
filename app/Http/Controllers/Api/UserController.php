@@ -4,10 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\CloudinaryService;
+use App\Services\ImageManagerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use OpenApi\Attributes as OA;
 
@@ -62,38 +60,26 @@ class UserController extends Controller
             new OA\Response(response: 200, description: "Image synced")
         ]
     )]
-    public function uploadImages(Request $request, User $user, CloudinaryService $cloudinary)
+    public function uploadImages(Request $request, User $user, ImageManagerService $imageManager)
     {
-        try {
-            if (!$request->hasFile('image')) {
-                return response()->json([
-                    'error' => 'No image uploaded'
-                ], 400);
-            }
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048'
+        ]);
 
-            $uploaded = $cloudinary->upload($request->file('image'), 'users');
+        $result = $imageManager->updateSingleImage(
+            $user,
+            $request->file('image'),
+            'users'
+        );
 
-            $user->image = [
-                'url' => $uploaded['secure_url'],
-                'public_id' => $uploaded['public_id'],
-            ];
-
-            $user->save();
-
-            return response()->json([
-                'message' => 'Images synced',
-                'user' => $user->fresh()
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Upload failed', [
-                'error' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 500);
+        if (!$result['success']) {
+            return response()->json(['error' => $result['error']], 500);
         }
 
+        return response()->json([
+            'message' => 'Images synced',
+            'user' => $result['model']
+        ]);
     }
 
     #[OA\Put(
