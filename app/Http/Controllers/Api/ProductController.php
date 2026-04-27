@@ -184,9 +184,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $validated = $this->validateProduct($request, true);
-
-        // 🚨 remove thumbnail from normal update payload
-        unset($validated['thumbnail']);
+        
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail'] = $request->file('thumbnail');
+        } else {
+            unset($validated['thumbnail']);
+        }
 
         $product->update($validated);
 
