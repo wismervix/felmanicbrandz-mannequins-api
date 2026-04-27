@@ -184,9 +184,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $validated = $this->validateProduct($request, true);
-        
+
         if ($request->hasFile('thumbnail')) {
             $validated['thumbnail'] = $request->file('thumbnail');
+        } elseif ($request->filled('thumbnail')) {
+            // existing thumbnail object sent from frontend
+            $validated['thumbnail'] = json_decode($request->thumbnail, true);
         } else {
             unset($validated['thumbnail']);
         }
@@ -249,8 +252,8 @@ class ProductController extends Controller
             'dimensions' => 'nullable|array',
             'reviews' => 'nullable|array',
             'meta' => 'nullable|array',
-            // 'thumbnail' => 'nullable|string',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'thumbnail' => 'nullable',
+            // 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
         return $request->validate($rules);
