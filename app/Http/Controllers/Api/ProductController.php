@@ -185,6 +185,9 @@ class ProductController extends Controller
 
         $validated = $this->validateProduct($request, true);
 
+        // 🚨 remove thumbnail from normal update payload
+        unset($validated['thumbnail']);
+
         $product->update($validated);
 
         return response()->json([
@@ -243,7 +246,8 @@ class ProductController extends Controller
             'dimensions' => 'nullable|array',
             'reviews' => 'nullable|array',
             'meta' => 'nullable|array',
-            'thumbnail' => 'nullable|string',
+            // 'thumbnail' => 'nullable|string',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
         return $request->validate($rules);
