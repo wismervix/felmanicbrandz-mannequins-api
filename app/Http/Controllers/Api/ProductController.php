@@ -251,7 +251,7 @@ class ProductController extends Controller
             'reviews' => 'nullable|array',
             'meta' => 'nullable|array',
             'thumbnail' => 'nullable',
-            // 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            // 'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:10240',
         ];
 
         return $request->validate($rules);
