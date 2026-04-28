@@ -138,9 +138,9 @@ class ProductController extends Controller
     public function uploadImages(Request $request, Product $product, ImageManagerService $imageManager)
     {
         $request->validate([
-            'thumbnail' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'thumbnail' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240',
             'images' => 'nullable|array',
-            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp|max:4096',
+            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp|max:51200',
             'removedImages' => 'nullable|array',
             'removedImages.*' => 'string'
         ]);
