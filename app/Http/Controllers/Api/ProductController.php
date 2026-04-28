@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use OpenApi\Attributes as OA;
 use App\Http\Controllers\Controller;
 use App\Services\ImageManagerService;
@@ -137,9 +138,9 @@ class ProductController extends Controller
     public function uploadImages(Request $request, Product $product, ImageManagerService $imageManager)
     {
         $request->validate([
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'thumbnail' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:2048',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:4096',
+            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp|max:4096',
             'removedImages' => 'nullable|array',
             'removedImages.*' => 'string'
         ]);
@@ -185,11 +186,8 @@ class ProductController extends Controller
 
         $validated = $this->validateProduct($request, true);
 
-        if ($request->hasFile('thumbnail')) {
+        if ($request->file('thumbnail') instanceof UploadedFile) {
             $validated['thumbnail'] = $request->file('thumbnail');
-        } elseif ($request->filled('thumbnail')) {
-            // existing thumbnail object sent from frontend
-            $validated['thumbnail'] = json_decode($request->thumbnail, true);
         } else {
             unset($validated['thumbnail']);
         }
