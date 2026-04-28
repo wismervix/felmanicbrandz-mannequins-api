@@ -140,7 +140,7 @@ class ProductController extends Controller
         $request->validate([
             'thumbnail' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:10240',
             'images' => 'nullable|array',
-            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp|max:51200',
+            'images.*' => 'file|image|mimes:jpeg,png,jpg,webp|max:5120',
             'removedImages' => 'nullable|array',
             'removedImages.*' => 'string'
         ]);
